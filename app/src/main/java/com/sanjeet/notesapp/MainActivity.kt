@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private suspend fun setupNotesList() {
         list = getNotesList()
 
