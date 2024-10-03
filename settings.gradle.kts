@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "NotesApp"
 include(":notesApp")
+include(":androidassignment")
