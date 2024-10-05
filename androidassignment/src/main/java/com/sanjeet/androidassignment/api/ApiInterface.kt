@@ -1,0 +1,1 @@
+package com.sanjeet.androidassignment.apiimport com.sanjeet.androidassignment.data.model.ApiResultimport kotlinx.coroutines.Deferredimport retrofit2.http.GETinterface ApiInterface {    @GET("character")    fun getCharacterList(): Deferred<ApiResult>}

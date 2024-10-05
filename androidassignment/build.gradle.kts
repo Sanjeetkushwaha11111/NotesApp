@@ -56,8 +56,16 @@ dependencies {
     implementation (libs.androidx.recyclerview)
     // Hilt
     implementation(libs.hilt.android)
-    implementation ("com.jakewharton.timber:timber:5.0.1")
+    implementation (libs.timber)
     kapt(libs.hilt.android.compiler)
+    implementation (libs.retrofit)
+    implementation (libs.retrofit2.kotlin.coroutines.adapter)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp3.okhttp)
+ //   implementation(libs.logging.interceptor)
+    implementation (libs.gson)
+    implementation (libs.converter.gson)
+
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

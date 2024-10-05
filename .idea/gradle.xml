@@ -9,7 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/androidassignment" />
+            <option value="$PROJECT_DIR$/notesApp" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
