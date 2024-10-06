@@ -1,1 +1,0 @@
-package com.sanjeet.androidassignment.data.modeldata class Origin(    val name: String,    val url: String)

@@ -1,16 +1,12 @@
 package com.sanjeet.androidassignment.ui.characterlist
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.sanjeet.androidassignment.R
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sanjeet.androidassignment.api.RetrofitHelper
 import com.sanjeet.androidassignment.data.repository.CharacterRepository
-import timber.log.Timber
+import com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding
 
 class CharacterListActivity : AppCompatActivity() {
 
@@ -20,34 +16,21 @@ class CharacterListActivity : AppCompatActivity() {
             CharacterViewModelFactory(CharacterRepository(RetrofitHelper.apiService))
         )[CharachterViewModel::class.java]
     }
+    private lateinit var binding: ActivityCharacterListBinding
+    private val characterListAdapter by lazy { CharacterListAdapter(arrayListOf()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_character_list)
-        viewModel.getCharacterList()
-        viewModel.characterLiveData.observe(this) {
-            for (i in it) {
-                Timber.e(">>>>name is ${i.name}")
-            }
+        binding = ActivityCharacterListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.listRv.apply {
+            adapter = characterListAdapter
+            layoutManager = LinearLayoutManager(this@CharacterListActivity)
         }
+        viewModel.getCharacterList()
 
-    }
-
-
-    private fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        val nw = connectivityManager.activeNetwork ?: return false
-        val networkCapabilities =
-            connectivityManager.getNetworkCapabilities(nw) ?: return false
-
-        return networkCapabilities.run {
-            hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)
+        viewModel.characterLiveData.observe(this) { characters ->
+            characterListAdapter.updateAdapter(characters)
         }
     }
 }

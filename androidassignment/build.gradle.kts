@@ -14,7 +14,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,6 +26,10 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -63,9 +66,11 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp3.okhttp)
  //   implementation(libs.logging.interceptor)
+    implementation (libs.okhttp3.logging.interceptor)
     implementation (libs.gson)
     implementation (libs.converter.gson)
 
+    implementation (libs.glide)
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

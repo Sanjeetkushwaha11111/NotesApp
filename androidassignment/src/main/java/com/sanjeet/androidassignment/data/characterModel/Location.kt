@@ -1,0 +1,1 @@
+package com.sanjeet.androidassignment.data.characterModeldata class Location(    val name: String,    val url: String)
