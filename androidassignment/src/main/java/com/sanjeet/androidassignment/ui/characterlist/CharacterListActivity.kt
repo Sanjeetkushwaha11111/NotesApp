@@ -9,16 +9,23 @@ import com.sanjeet.androidassignment.api.RetrofitHelper
 import com.sanjeet.androidassignment.data.characterModel.CharacterList
 import com.sanjeet.androidassignment.data.repository.CharacterRepository
 import com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding
+import com.sanjeet.androidassignment.utils.showToast
 
 class CharacterListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCharacterListBinding
     private val viewModel: CharacterViewModel by viewModels {
-        CharacterViewModelFactory(CharacterRepository(RetrofitHelper.apiService, (application as MyApplication).database.bookMarkDao()))
+        CharacterViewModelFactory(
+            CharacterRepository(
+                RetrofitHelper.apiService,
+                (application as MyApplication).database.bookMarkDao()
+            )
+        )
     }
-    private val characterListAdapter = CharacterListAdapter(arrayListOf()) { characterList, isStarred ->
-        starClicked(characterList, isStarred)
-    }
+    private val characterListAdapter =
+        CharacterListAdapter(arrayListOf()) { characterList, isStarred ->
+            starClicked(characterList, isStarred)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +50,11 @@ class CharacterListActivity : AppCompatActivity() {
     }
 
     private fun starClicked(characterList: CharacterList, isBookMarked: Boolean) {
+        if (isBookMarked) {
+            showToast(" ${characterList.name}  added to bookmark!")
+        } else {
+            showToast(" ${characterList.name} removed from bookmark!")
+        }
         viewModel.toggleBookmarkForCharacter(characterList, isBookMarked)
     }
 }

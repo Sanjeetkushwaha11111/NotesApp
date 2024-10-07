@@ -1,0 +1,1 @@
+package com.sanjeet.androidassignment.utilsimport android.content.Contextimport android.widget.Toastprivate var currentToast: Toast? = nullfun Context.showToast(message: String) {    currentToast?.cancel()    currentToast =        Toast.makeText(this, message, Toast.LENGTH_SHORT).apply {            show()        }}
