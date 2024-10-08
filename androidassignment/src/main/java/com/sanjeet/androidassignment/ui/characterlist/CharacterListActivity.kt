@@ -20,8 +20,9 @@ class CharacterListActivity : AppCompatActivity() {
             )
         )
     }
-    private val characterListAdapter =
-        CharacterListAdapter(arrayListOf())
+    private val characterListAdapter by lazy {
+        CharacterListAdapter(arrayListOf(),viewModel)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
