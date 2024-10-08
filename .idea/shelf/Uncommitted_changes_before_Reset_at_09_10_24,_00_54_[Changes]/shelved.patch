@@ -1,0 +1,320 @@
+Index: androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanjeet.androidassignment.ui.characterlist\n\nimport android.os.Bundle\nimport androidx.activity.viewModels\nimport androidx.appcompat.app.AppCompatActivity\nimport androidx.recyclerview.widget.LinearLayoutManager\nimport com.sanjeet.androidassignment.MyApplication\nimport com.sanjeet.androidassignment.api.RetrofitHelper\nimport com.sanjeet.androidassignment.data.characterModel.CharacterList\nimport com.sanjeet.androidassignment.data.repository.CharacterRepository\nimport com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding\nimport com.sanjeet.androidassignment.utils.showToast\n\nclass CharacterListActivity : AppCompatActivity() {\n\n    private lateinit var binding: ActivityCharacterListBinding\n    private val viewModel: CharacterViewModel by viewModels {\n        CharacterViewModelFactory(\n            CharacterRepository(\n                RetrofitHelper.apiService,\n                (application as MyApplication).database.bookMarkDao()\n            )\n        )\n    }\n    private val characterListAdapter =\n        CharacterListAdapter(arrayListOf()) { characterList, isStarred ->\n            starClicked(characterList, isStarred)\n        }\n\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        binding = ActivityCharacterListBinding.inflate(layoutInflater)\n        setContentView(binding.root)\n        setupRecyclerView()\n        observeViewModel()\n        viewModel.fetchCharacterList()\n    }\n\n    private fun setupRecyclerView() {\n        binding.listRv.apply {\n            adapter = characterListAdapter\n            layoutManager = LinearLayoutManager(this@CharacterListActivity)\n        }\n    }\n\n    private fun observeViewModel() {\n        viewModel.characterLiveData.observe(this) { characters ->\n            characterListAdapter.updateAdapter(characters)\n        }\n    }\n\n    private fun starClicked(characterList: CharacterList, isBookMarked: Boolean) {\n        if (isBookMarked) {\n            showToast(\" ${characterList.name}  added to bookmark!\")\n        } else {\n            showToast(\" ${characterList.name} removed from bookmark!\")\n        }\n        viewModel.toggleBookmarkForCharacter(characterList, isBookMarked)\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListActivity.kt b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListActivity.kt
+--- a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListActivity.kt	(revision 8b0007e78dd4bb6ddc9b719eb2e190f83b49268e)
++++ b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListActivity.kt	(date 1728415021184)
+@@ -6,10 +6,8 @@
+ import androidx.recyclerview.widget.LinearLayoutManager
+ import com.sanjeet.androidassignment.MyApplication
+ import com.sanjeet.androidassignment.api.RetrofitHelper
+-import com.sanjeet.androidassignment.data.characterModel.CharacterList
+ import com.sanjeet.androidassignment.data.repository.CharacterRepository
+ import com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding
+-import com.sanjeet.androidassignment.utils.showToast
+ 
+ class CharacterListActivity : AppCompatActivity() {
+ 
+@@ -23,9 +21,7 @@
+         )
+     }
+     private val characterListAdapter =
+-        CharacterListAdapter(arrayListOf()) { characterList, isStarred ->
+-            starClicked(characterList, isStarred)
+-        }
++        CharacterListAdapter(arrayListOf())
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+@@ -49,12 +45,4 @@
+         }
+     }
+ 
+-    private fun starClicked(characterList: CharacterList, isBookMarked: Boolean) {
+-        if (isBookMarked) {
+-            showToast(" ${characterList.name}  added to bookmark!")
+-        } else {
+-            showToast(" ${characterList.name} removed from bookmark!")
+-        }
+-        viewModel.toggleBookmarkForCharacter(characterList, isBookMarked)
+-    }
+ }
+\ No newline at end of file
+Index: androidassignment/src/main/java/com/sanjeet/androidassignment/data/characterModel/CharacterList.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanjeet.androidassignment.data.characterModel\r\rimport androidx.room.ColumnInfo\rimport androidx.room.Entity\rimport androidx.room.PrimaryKey\r\r@Entity(tableName = \"bookmarked_characters\")\rdata class CharacterList(\r    @ColumnInfo val created: String,\r    @ColumnInfo val episode: List<String>,\r    @ColumnInfo val gender: String,\r    @PrimaryKey val id: Int,\r    @ColumnInfo val image: String,\r    @ColumnInfo val location: Location,\r    @ColumnInfo val name: String,\r    @ColumnInfo val origin: Origin,\r    @ColumnInfo val species: String,\r    @ColumnInfo val status: String,\r    @ColumnInfo val type: String,\r    @ColumnInfo val url: String,\r    @ColumnInfo var episodeName: String,\r    @ColumnInfo var isBookMarked: Boolean\r)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/androidassignment/src/main/java/com/sanjeet/androidassignment/data/characterModel/CharacterList.kt b/androidassignment/src/main/java/com/sanjeet/androidassignment/data/characterModel/CharacterList.kt
+--- a/androidassignment/src/main/java/com/sanjeet/androidassignment/data/characterModel/CharacterList.kt	(revision 8b0007e78dd4bb6ddc9b719eb2e190f83b49268e)
++++ b/androidassignment/src/main/java/com/sanjeet/androidassignment/data/characterModel/CharacterList.kt	(date 1728415188483)
+@@ -18,6 +18,6 @@
+     @ColumnInfo val status: String,
+     @ColumnInfo val type: String,
+     @ColumnInfo val url: String,
+-    @ColumnInfo var episodeName: String,
++    @ColumnInfo var episodeName: String?=null,
+     @ColumnInfo var isBookMarked: Boolean
+ )
+\ No newline at end of file
+Index: androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharachterViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanjeet.androidassignment.ui.characterlist\r\rimport android.widget.Toast\rimport androidx.lifecycle.LiveData\rimport androidx.lifecycle.MutableLiveData\rimport androidx.lifecycle.ViewModel\rimport androidx.lifecycle.viewModelScope\rimport com.sanjeet.androidassignment.api.UseCaseResult\rimport com.sanjeet.androidassignment.data.characterModel.CharacterList\rimport com.sanjeet.androidassignment.data.repository.CharacterRepository\rimport dagger.hilt.android.internal.Contexts.getApplication\rimport kotlinx.coroutines.Dispatchers\rimport kotlinx.coroutines.launch\rimport kotlinx.coroutines.withContext\rimport timber.log.Timber\r\rclass CharacterViewModel(private val repository: CharacterRepository) : ViewModel() {\r\r    private val _characterLiveData = MutableLiveData<List<CharacterList>>()\r    val characterLiveData: LiveData<List<CharacterList>> = _characterLiveData\r\r    fun fetchCharacterList() {\r        viewModelScope.launch(Dispatchers.IO) {\r\r            when (val response = repository.getAllCharacters()) {\r                is UseCaseResult.Success -> {\r                    _characterLiveData.postValue(response.data.results!!)\r                    fetchEpisodeNames(response.data.results)\r                    getBookMarkedCharacterById(response.data.results)\r                }\r\r                is UseCaseResult.Exception -> {\r                    Timber.e(\">>>>>>>> getCharacterList api exception ${response.exception}\")\r                }\r            }\r        }\r    }\r\r\r    private suspend fun fetchEpisodeNames(characters: MutableList<CharacterList>) {\r        viewModelScope.launch(Dispatchers.IO) {\r            characters.forEach { characterWithEpisode ->\r                val episode = repository.fetchEpisodeForCharacter(characterWithEpisode.episode[0])\r                when (episode) {\r                    is UseCaseResult.Success -> {\r                        characterWithEpisode.episodeName = episode.data.name\r                    }\r                    is UseCaseResult.Exception -> {\r                        Timber.e(\">>>>>>>> fetchEpisodeNames api exception ${episode.exception}\")\r                    }\r                }\r                withContext(Dispatchers.Main) {\r                    _characterLiveData.postValue(characters)\r                }\r            }\r        }\r    }\r\r    private suspend fun getBookMarkedCharacterById(characters: MutableList<CharacterList>) {\r        viewModelScope.launch(Dispatchers.IO) {\r            characters.forEach { character ->\r                character.isBookMarked = repository.getBookMarkedCharacterById(character.id)\r            }\r            withContext(Dispatchers.Main) {\r                _characterLiveData.postValue(characters)\r            }\r        }\r    }\r\r    fun toggleBookmarkForCharacter(character: CharacterList, isBookMarked: Boolean) {\r        viewModelScope.launch(Dispatchers.IO) {\r            repository.bookMarkCharacter(character, isBookMarked)\r            val updatedCharacter = character.copy(isBookMarked = isBookMarked)\r            updateCharacterListAfterBookmark(updatedCharacter)\r        }\r    }\r\r    private fun updateCharacterListAfterBookmark(updatedCharacter: CharacterList) {\r        val currentList = _characterLiveData.value ?: return\r        val newList = currentList.map { if (it.id == updatedCharacter.id) updatedCharacter else it }\r        _characterLiveData.postValue(newList)\r    }\r}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharachterViewModel.kt b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharachterViewModel.kt
+--- a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharachterViewModel.kt	(revision 8b0007e78dd4bb6ddc9b719eb2e190f83b49268e)
++++ b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharachterViewModel.kt	(date 1728413725730)
+@@ -1,6 +1,5 @@
+ package com.sanjeet.androidassignment.ui.characterlist
+ 
+-import android.widget.Toast
+ import androidx.lifecycle.LiveData
+ import androidx.lifecycle.MutableLiveData
+ import androidx.lifecycle.ViewModel
+@@ -8,7 +7,6 @@
+ import com.sanjeet.androidassignment.api.UseCaseResult
+ import com.sanjeet.androidassignment.data.characterModel.CharacterList
+ import com.sanjeet.androidassignment.data.repository.CharacterRepository
+-import dagger.hilt.android.internal.Contexts.getApplication
+ import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.launch
+ import kotlinx.coroutines.withContext
+@@ -45,6 +43,7 @@
+                     is UseCaseResult.Success -> {
+                         characterWithEpisode.episodeName = episode.data.name
+                     }
++
+                     is UseCaseResult.Exception -> {
+                         Timber.e(">>>>>>>> fetchEpisodeNames api exception ${episode.exception}")
+                     }
+@@ -69,7 +68,11 @@
+ 
+     fun toggleBookmarkForCharacter(character: CharacterList, isBookMarked: Boolean) {
+         viewModelScope.launch(Dispatchers.IO) {
+-            repository.bookMarkCharacter(character, isBookMarked)
++            if (isBookMarked) {
++                repository.addBookMarkedCharacter(character)
++            } else {
++                repository.removeBookMarkedCharacter(character)
++            }
+             val updatedCharacter = character.copy(isBookMarked = isBookMarked)
+             updateCharacterListAfterBookmark(updatedCharacter)
+         }
+Index: androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListAdapter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanjeet.androidassignment.ui.characterlist\r\rimport android.os.Bundle\rimport android.view.LayoutInflater\rimport android.view.ViewGroup\rimport androidx.recyclerview.widget.DiffUtil\rimport androidx.recyclerview.widget.RecyclerView\rimport com.bumptech.glide.Glide\rimport com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions\rimport com.sanjeet.androidassignment.R\rimport com.sanjeet.androidassignment.data.characterModel.CharacterList\rimport com.sanjeet.androidassignment.databinding.CharacterListItemBinding\r\rclass CharacterListAdapter(\r    characterLists: List<CharacterList>,\r    private val onStarClick: (CharacterList, Boolean) -> Unit\r) :\r    RecyclerView.Adapter<CharacterListViewHolder>() {\r\r    private var charList = characterLists\r\r\r    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterListViewHolder {\r        return CharacterListViewHolder(\r            CharacterListItemBinding.inflate(\r                LayoutInflater.from(parent.context),\r                parent,\r                false\r            ), onStarClick\r        )\r\r    }\r\r    override fun getItemCount(): Int = charList.size\r\r\r    override fun onBindViewHolder(holder: CharacterListViewHolder, position: Int) {\r        holder.bindItems(charList[position])\r    }\r\r    override fun onBindViewHolder(\r        holder: CharacterListViewHolder,\r        position: Int,\r        payloads: MutableList<Any>\r    ) {\r        if (payloads.isEmpty()) {\r            holder.bindItems(charList[position])\r        } else {\r            val payload = payloads[0] as Bundle\r            holder.bindPartialItems(charList[position], payload)\r        }\r    }\r\r    fun updateAdapter(characterLists: List<CharacterList>) {\r        val diffCallback = CharacterDiffCallback(this.charList, characterLists)\r        val diffResult = DiffUtil.calculateDiff(diffCallback)\r        this.charList = characterLists\r        diffResult.dispatchUpdatesTo(this)\r    }\r\r    class CharacterDiffCallback(\r        private val oldList: List<CharacterList>,\r        private val newList: List<CharacterList>\r    ) : DiffUtil.Callback() {\r\r        override fun getOldListSize(): Int = oldList.size\r        override fun getNewListSize(): Int = newList.size\r\r        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {\r            // Compare items by their unique id\r            return oldList[oldItemPosition].id == newList[newItemPosition].id\r        }\r\r        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {\r            // Compare the content of items, you can customize the checks here\r            return oldList[oldItemPosition] == newList[newItemPosition]\r        }\r\r        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {\r            val oldItem = oldList[oldItemPosition]\r            val newItem = newList[newItemPosition]\r\r            val diffBundle = Bundle()\r\r            if (oldItem.isBookMarked != newItem.isBookMarked) {\r                diffBundle.putBoolean(\"KEY_BOOKMARK\", newItem.isBookMarked)\r            }\r\r            return if (diffBundle.size() == 0) null else diffBundle\r        }\r    }\r}\r\rclass CharacterListViewHolder(\r    private var binding: CharacterListItemBinding,\r    private var starClick: (CharacterList, Boolean) -> Unit\r) : RecyclerView.ViewHolder(binding.root) {\r\r    fun bindItems(list: CharacterList) {\r        Glide.with(binding.image.context).load(list.image)\r            .transition(DrawableTransitionOptions.withCrossFade()).into(binding.image)\r\r        // Safely handle nullable fields with ?: to provide a fallback value\r        binding.name.text = list.name ?: \"Unknown Name\"\r        binding.allDetails.text = \"${list.gender ?: \"Unknown Gender\"} . ${list.species ?: \"Unknown Species\"} . ${list.location?.name ?: \"Unknown Location\"}\"\r        binding.episodeName.text = if (list.episodeName.isNullOrEmpty()) \"...\" else list.episodeName\r\r        updateBookmarkIcon(list.isBookMarked)\r\r        binding.bookmark.setOnClickListener {\r            val newBookmarkStatus = !list.isBookMarked\r            updateBookmarkIcon(newBookmarkStatus)\r            starClick(list, newBookmarkStatus)\r        }\r    }\r\r    // Update only the changed fields based on the payload\r    fun bindPartialItems(list: CharacterList, payload: Bundle) {\r        if (payload.containsKey(\"KEY_BOOKMARK\")) {\r            updateBookmarkIcon(payload.getBoolean(\"KEY_BOOKMARK\"))\r        }\r    }\r\r    private fun updateBookmarkIcon(isBookMarked: Boolean) {\r        if (isBookMarked) {\r            binding.bookmark.setImageResource(R.drawable.filled_star)\r        } else {\r            binding.bookmark.setImageResource(R.drawable.unfilled_star)\r        }\r    }\r}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListAdapter.kt b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListAdapter.kt
+--- a/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListAdapter.kt	(revision 8b0007e78dd4bb6ddc9b719eb2e190f83b49268e)
++++ b/androidassignment/src/main/java/com/sanjeet/androidassignment/ui/characterlist/CharacterListAdapter.kt	(date 1728415188479)
+@@ -1,19 +1,18 @@
+ package com.sanjeet.androidassignment.ui.characterlist
+ 
+-import android.os.Bundle
+ import android.view.LayoutInflater
+ import android.view.ViewGroup
+-import androidx.recyclerview.widget.DiffUtil
++import android.widget.Toast
+ import androidx.recyclerview.widget.RecyclerView
+ import com.bumptech.glide.Glide
+ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+ import com.sanjeet.androidassignment.R
+ import com.sanjeet.androidassignment.data.characterModel.CharacterList
+ import com.sanjeet.androidassignment.databinding.CharacterListItemBinding
++import timber.log.Timber
+ 
+ class CharacterListAdapter(
+-    characterLists: List<CharacterList>,
+-    private val onStarClick: (CharacterList, Boolean) -> Unit
++    characterLists: List<CharacterList>
+ ) :
+     RecyclerView.Adapter<CharacterListViewHolder>() {
+ 
+@@ -26,106 +25,69 @@
+                 LayoutInflater.from(parent.context),
+                 parent,
+                 false
+-            ), onStarClick
++            )
+         )
++        Timber.e(">>>>>>>>>>>>> onCreateViewHolder")
++    }
+ 
++    override fun getItemCount(): Int {
++        Timber.e(">>>>>>>>>>>>> getItemCount ${charList.size}")
++        return charList.size
+     }
+-
+-    override fun getItemCount(): Int = charList.size
+ 
+ 
+     override fun onBindViewHolder(holder: CharacterListViewHolder, position: Int) {
+         holder.bindItems(charList[position])
+     }
+-
+-    override fun onBindViewHolder(
+-        holder: CharacterListViewHolder,
+-        position: Int,
+-        payloads: MutableList<Any>
+-    ) {
+-        if (payloads.isEmpty()) {
+-            holder.bindItems(charList[position])
+-        } else {
+-            val payload = payloads[0] as Bundle
+-            holder.bindPartialItems(charList[position], payload)
+-        }
+-    }
+ 
+     fun updateAdapter(characterLists: List<CharacterList>) {
+-        val diffCallback = CharacterDiffCallback(this.charList, characterLists)
+-        val diffResult = DiffUtil.calculateDiff(diffCallback)
+         this.charList = characterLists
+-        diffResult.dispatchUpdatesTo(this)
++        notifyDataSetChanged()
+     }
+-
+-    class CharacterDiffCallback(
+-        private val oldList: List<CharacterList>,
+-        private val newList: List<CharacterList>
+-    ) : DiffUtil.Callback() {
+-
+-        override fun getOldListSize(): Int = oldList.size
+-        override fun getNewListSize(): Int = newList.size
+-
+-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+-            // Compare items by their unique id
+-            return oldList[oldItemPosition].id == newList[newItemPosition].id
+-        }
+ 
+-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+-            // Compare the content of items, you can customize the checks here
+-            return oldList[oldItemPosition] == newList[newItemPosition]
+-        }
+ 
+-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+-            val oldItem = oldList[oldItemPosition]
+-            val newItem = newList[newItemPosition]
+-
+-            val diffBundle = Bundle()
+-
+-            if (oldItem.isBookMarked != newItem.isBookMarked) {
+-                diffBundle.putBoolean("KEY_BOOKMARK", newItem.isBookMarked)
+-            }
+-
+-            return if (diffBundle.size() == 0) null else diffBundle
+-        }
+-    }
+ }
+ 
+ class CharacterListViewHolder(
+-    private var binding: CharacterListItemBinding,
+-    private var starClick: (CharacterList, Boolean) -> Unit
+-) : RecyclerView.ViewHolder(binding.root) {
+-
++    private var binding: CharacterListItemBinding
++) :
++    RecyclerView.ViewHolder(binding.root) {
+     fun bindItems(list: CharacterList) {
+         Glide.with(binding.image.context).load(list.image)
+             .transition(DrawableTransitionOptions.withCrossFade()).into(binding.image)
+-
+-        // Safely handle nullable fields with ?: to provide a fallback value
+-        binding.name.text = list.name ?: "Unknown Name"
+-        binding.allDetails.text = "${list.gender ?: "Unknown Gender"} . ${list.species ?: "Unknown Species"} . ${list.location?.name ?: "Unknown Location"}"
+-        binding.episodeName.text = if (list.episodeName.isNullOrEmpty()) "..." else list.episodeName
+-
+-        updateBookmarkIcon(list.isBookMarked)
+-
+-        binding.bookmark.setOnClickListener {
+-            val newBookmarkStatus = !list.isBookMarked
+-            updateBookmarkIcon(newBookmarkStatus)
+-            starClick(list, newBookmarkStatus)
+-        }
+-    }
+-
+-    // Update only the changed fields based on the payload
+-    fun bindPartialItems(list: CharacterList, payload: Bundle) {
+-        if (payload.containsKey("KEY_BOOKMARK")) {
+-            updateBookmarkIcon(payload.getBoolean("KEY_BOOKMARK"))
++        list.apply {
++            binding.name.text = name
++            binding.allDetails.text = "${gender} . ${species} . ${location.name}"
++            if (episodeName.isNullOrEmpty()) {
++                binding.episodeName.text = "..."
++            } else {
++                binding.episodeName.text = episodeName
++            }
+         }
+-    }
+-
+-    private fun updateBookmarkIcon(isBookMarked: Boolean) {
+-        if (isBookMarked) {
++        if (list.isBookMarked) {
+             binding.bookmark.setImageResource(R.drawable.filled_star)
+         } else {
+             binding.bookmark.setImageResource(R.drawable.unfilled_star)
+         }
++
++//        binding.bookmark.setOnClickListener {
++//            if (!list.isBookMarked) {
++//                binding.bookmark.setImageResource(R.drawable.filled_star)
++//                Toast.makeText(
++//                    binding.name.context,
++//                    "$list.name added to Bookmarked",
++//                    Toast.LENGTH_SHORT
++//                ).show()
++//            } else {
++//                Toast.makeText(
++//                    binding.name.context,
++//                    "$list.name removed from Bookmarked",
++//                    Toast.LENGTH_SHORT
++//                ).show()
++//                binding.bookmark.setImageResource(R.drawable.unfilled_star)
++//            }
++//            viewModel.toggleBookmarkForCharacter(list, !list.isBookMarked)
++//        }
+     }
++
+ }
+\ No newline at end of file
+Index: androidassignment/src/main/java/com/sanjeet/androidassignment/data/repository/CharacterRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanjeet.androidassignment.data.repository\r\rimport com.sanjeet.androidassignment.api.ApiInterface\rimport com.sanjeet.androidassignment.api.UseCaseResult\rimport com.sanjeet.androidassignment.data.characterModel.ApiResult\rimport com.sanjeet.androidassignment.data.characterModel.CharacterList\rimport com.sanjeet.androidassignment.data.characterModel.Episode\rimport com.sanjeet.androidassignment.data.db.BookMarDao\r\r\rclass CharacterRepository(\r    private val apiInterface: ApiInterface,\r    private val bookMarDao: BookMarDao\r) {\r\r    suspend fun getAllCharacters(): UseCaseResult<ApiResult> {\r        try {\r            val result = apiInterface.getCharacterList().await()\r            return UseCaseResult.Success(result)\r        } catch (e: Exception) {\r            return UseCaseResult.Exception(e)\r        }\r    }\r\r\r    suspend fun fetchEpisodeForCharacter(episodeUrl: String): UseCaseResult<Episode> {\r        try {\r            val result = apiInterface.getEpisode(episodeUrl).await()\r            return UseCaseResult.Success(result)\r        } catch (e: Exception) {\r            return UseCaseResult.Exception(e)\r        }\r    }\r\r    suspend fun bookMarkCharacter(character: CharacterList, isBookMarked: Boolean) {\r        if (isBookMarked) {\r            bookMarDao.addBookMarkedCharacter(character)\r        } else {\r            bookMarDao.removeBookMarkedCharacter(character)\r        }\r    }\r\r    suspend fun getBookMarkedCharacterById(id: Int): Boolean {\r        val result = bookMarDao.isCharacterBookmarked(id)\r        return result\r    }\r}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/androidassignment/src/main/java/com/sanjeet/androidassignment/data/repository/CharacterRepository.kt b/androidassignment/src/main/java/com/sanjeet/androidassignment/data/repository/CharacterRepository.kt
+--- a/androidassignment/src/main/java/com/sanjeet/androidassignment/data/repository/CharacterRepository.kt	(revision 8b0007e78dd4bb6ddc9b719eb2e190f83b49268e)
++++ b/androidassignment/src/main/java/com/sanjeet/androidassignment/data/repository/CharacterRepository.kt	(date 1728413725735)
+@@ -32,12 +32,12 @@
+         }
+     }
+ 
+-    suspend fun bookMarkCharacter(character: CharacterList, isBookMarked: Boolean) {
+-        if (isBookMarked) {
+-            bookMarDao.addBookMarkedCharacter(character)
+-        } else {
+-            bookMarDao.removeBookMarkedCharacter(character)
+-        }
++    suspend fun addBookMarkedCharacter(character: CharacterList) {
++        bookMarDao.addBookMarkedCharacter(character)
++    }
++
++    suspend fun removeBookMarkedCharacter(character: CharacterList) {
++        bookMarDao.removeBookMarkedCharacter(character)
+     }
+ 
+     suspend fun getBookMarkedCharacterById(id: Int): Boolean {

@@ -6,10 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sanjeet.androidassignment.MyApplication
 import com.sanjeet.androidassignment.api.RetrofitHelper
-import com.sanjeet.androidassignment.data.characterModel.CharacterList
 import com.sanjeet.androidassignment.data.repository.CharacterRepository
 import com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding
-import com.sanjeet.androidassignment.utils.showToast
 
 class CharacterListActivity : AppCompatActivity() {
 
@@ -23,9 +21,7 @@ class CharacterListActivity : AppCompatActivity() {
         )
     }
     private val characterListAdapter =
-        CharacterListAdapter(arrayListOf()) { characterList, isStarred ->
-            starClicked(characterList, isStarred)
-        }
+        CharacterListAdapter(arrayListOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +45,4 @@ class CharacterListActivity : AppCompatActivity() {
         }
     }
 
-    private fun starClicked(characterList: CharacterList, isBookMarked: Boolean) {
-        if (isBookMarked) {
-            showToast(" ${characterList.name}  added to bookmark!")
-        } else {
-            showToast(" ${characterList.name} removed from bookmark!")
-        }
-        viewModel.toggleBookmarkForCharacter(characterList, isBookMarked)
-    }
 }
