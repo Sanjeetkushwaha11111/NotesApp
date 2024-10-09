@@ -1,1 +1,1 @@
-package com.sanjeet.androidassignment.data.characterModeldata class ApiResult(    val info: Info?=null,    val results: MutableList<CharacterList>?=null)
+package com.sanjeet.androidassignment.data.characterModeldata class ApiResult(    val info: Info?=null,    val results: List<Character>?=null)

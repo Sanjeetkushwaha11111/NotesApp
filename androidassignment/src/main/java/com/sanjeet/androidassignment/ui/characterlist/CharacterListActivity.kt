@@ -8,6 +8,7 @@ import com.sanjeet.androidassignment.MyApplication
 import com.sanjeet.androidassignment.api.RetrofitHelper
 import com.sanjeet.androidassignment.data.repository.CharacterRepository
 import com.sanjeet.androidassignment.databinding.ActivityCharacterListBinding
+import timber.log.Timber
 
 class CharacterListActivity : AppCompatActivity() {
 
@@ -21,7 +22,7 @@ class CharacterListActivity : AppCompatActivity() {
         )
     }
     private val characterListAdapter by lazy {
-        CharacterListAdapter(arrayListOf(),viewModel)
+        CharacterListAdapter(viewModel)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +43,8 @@ class CharacterListActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.characterLiveData.observe(this) { characters ->
-            characterListAdapter.updateAdapter(characters)
+            Timber.e(">>>>>>>>into observer")
+            characterListAdapter.submitList(characters)
         }
     }
-
 }
